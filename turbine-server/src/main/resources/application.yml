@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: turbine-server
+
+server:
+  port: 8989
+
+management:
+  security:
+    enabled: false
+
+
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 10
+    prefer-ip-address: true
+  client:
+    registryFetchIntervalSeconds: 5
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVICE_URL:http://localhost:8761}/eureka/
+
+turbine:
+  cluster-name-expression: new String("default")
+  app-config: FOOTBALL,HOCKEY
+

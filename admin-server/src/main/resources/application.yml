@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: admin-dashboard
+
+server:
+  port: 9006
+
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 10
+    prefer-ip-address: true
+  client:
+    registryFetchIntervalSeconds: 5
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVICE_URL:http://localhost:8761}/eureka/
+
+spring.boot.admin.routes.endpoints: env,metrics,trace,dump,jolokia,info,configprops,trace,logfile,refresh,flyway,liquibase,heapdump,hystrix.stream
+
+
+spring.boot.admin.turbine:
+  clusters: default
+  url: http://localhost:8989/turbine.stream

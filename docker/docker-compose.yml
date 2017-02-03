@@ -1,0 +1,56 @@
+version: '2'
+
+services:
+  eureka:
+    image: bellmedia/register-service
+    container_name: eureka
+    ports:
+      - "8761:8761"
+
+  gateway:
+    image: bellmedia/api-gateway
+    container_name: gateway
+    ports:
+      - "9001:9001"
+    depends_on:
+      - eureka
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+
+  turbine:
+    image: bellmedia/turbine-server
+    ports:
+      - "8989:8989"
+    depends_on:
+      - eureka
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+
+  hockey:
+    image: bellmedia/hockey-service
+    ports:
+      - "9000:9000"
+    depends_on:
+      - eureka
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+
+  football:
+    image: bellmedia/football-service
+    ports:
+      - "9003:9003"
+    depends_on:
+      - eureka
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+
+  dashboard:
+    image: bellmedia/admin-server
+    depends_on:
+      - eureka
+      - turbine
+    ports:
+      - "9006:9006"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+      - SPRING_BOOT_ADMIN_TURBINE_URL=http://turbine:8989/turbine.stream
