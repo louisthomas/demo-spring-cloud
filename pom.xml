@@ -15,7 +15,6 @@
     <module>football-service</module>
     <module>hockey-service</module>
     <module>register-service</module>
-    <module>turbine-server</module>
   </modules>
 
   <parent>

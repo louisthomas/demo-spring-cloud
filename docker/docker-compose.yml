@@ -18,7 +18,7 @@ services:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
 
   turbine:
-    image: bellmedia/turbine-server
+    image: ltlamontagne/turbine-server
     ports:
       - "8989:8989"
     depends_on:
@@ -45,12 +45,12 @@ services:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
 
   dashboard:
-    image: bellmedia/admin-server
+    image: ltlamontagne/spring-boot-admin
     depends_on:
       - eureka
       - turbine
     ports:
-      - "9006:9006"
+      - "9006:9001"
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
       - SPRING_BOOT_ADMIN_TURBINE_URL=http://turbine:8989/turbine.stream
