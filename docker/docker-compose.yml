@@ -1,56 +1,88 @@
 version: '2'
 
 services:
-  eureka:
-    image: bellmedia/register-service
-    container_name: eureka
+  config-server:
+    image: ltlamontagne/spring-cloud-config-server:0.0.1-SNAPSHOT
+    container_name: config-server
+    depends_on:
+      - eureka-server
+    ports:
+      - "8888:8888"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_CLOUD_CONFIG_SERVER_GIT_URI=file:///repo
+    volumes:
+    - "/Volumes/Projects/personal/spring-cloud-config-repo:/repo"
+
+  eureka-server:
+    image: ltlamontagne/eureka-server:0.0.1-SNAPSHOT
+    container_name: eureka-server
     ports:
       - "8761:8761"
 
-  gateway:
+  api-gateway:
     image: bellmedia/api-gateway
-    container_name: gateway
+    container_name: api-gateway
     ports:
       - "9001:9001"
     depends_on:
-      - eureka
+      - eureka-server
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - ZUUL_HEALTH_ENABLED=true
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
 
-  turbine:
-    image: ltlamontagne/turbine-server
-    ports:
-      - "8989:8989"
-    depends_on:
-      - eureka
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
-
-  hockey:
-    image: bellmedia/hockey-service
-    ports:
-      - "9000:9000"
-    depends_on:
-      - eureka
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
-
-  football:
-    image: bellmedia/football-service
+  football-service-v1:
+    image: bellmedia/football-service:1
+    container_name: football-service-v1
     ports:
       - "9003:9003"
     depends_on:
-      - eureka
+      - eureka-server
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
 
-  dashboard:
-    image: ltlamontagne/spring-boot-admin
-    depends_on:
-      - eureka
-      - turbine
-    ports:
-      - "9006:9001"
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
-      - SPRING_BOOT_ADMIN_TURBINE_URL=http://turbine:8989/turbine.stream
+  football-service-v2:
+      image: bellmedia/football-service:2
+      container_name: football-service-v2
+      ports:
+        - "9004:9003"
+      depends_on:
+        - eureka-server
+      environment:
+        - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+        - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+
+#  hockey-service:
+#    image: bellmedia/hockey-service
+#    container_name: hockey-service
+#    ports:
+#      - "9000:9000"
+#    depends_on:
+#      - eureka-server
+#    environment:
+#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+#      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+
+#  turbine:
+#    image: ltlamontagne/turbine-server:0.0.1-SNAPSHOT
+#    ports:
+#      - "8989:8989"
+#    depends_on:
+#      - eureka-server
+#    environment:
+#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+
+#  dashboard:
+#    image: ltlamontagne/spring-boot-admin:0.0.1-SNAPSHOT
+#    depends_on:
+#      - eureka-server
+#      - turbine
+#    ports:
+#      - "9006:9001"
+#    environment:
+#      - EUREKA_CLIENT_ENABLED=true
+#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+#      - SPRINT_BOOT_ADMIN_TURBINE_ENABLED=true
+#      - SPRING_BOOT_ADMIN_TURBINE_URL=http://turbine:8989/turbine.stream

@@ -11,6 +11,6 @@ public class TeamController {
 
     @RequestMapping(value = "/ping", method = RequestMethod.GET)
     public String getPing(){
-        return "pong";
+        return "pong-v1";
     }
 }

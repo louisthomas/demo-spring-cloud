@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    config:
+      enabled: true
+      discovery:
+        service-id: config-server
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+server:
+  port: 9001
+management:
+  security:
+    enabled: false
+
